@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecionamento Forçado - Abrindo no Navegador...</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 400px; margin: 50px auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; font-size: 1.5em; }
+        p { color: #666; line-height: 1.6; }
+        .manual-step { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        .manual-step strong { color: #007bff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Redirecionando...</h1>
+        <p id="message">Estamos tentando abrir sua página de vendas no navegador padrão (Safari ou Chrome) para uma melhor experiência.</p>
+        
+        <div id="manual-instructions" style="display:none;">
+            <div class="manual-step">
+                <p><strong>Se não abrir:</strong></p>
+                <p>1. Toque no ícone de <strong>três pontos (...)</strong> no canto superior.</p>
+                <p>2. Selecione <strong>"Abrir no Navegador"</strong>.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ********************************************************************
+        // PASSO 1: SUBSTITUA ESTA URL PELA URL FINAL DO SEU GOOGLE SITES
+        // ********************************************************************
+        const TARGET_URL = "https://sites.google.com/view/kirvanovendas/kauan"; 
+        // ********************************************************************
+
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+        const isAndroid = /android/i.test(userAgent);
+
+        // Função para forçar a abertura
+        function forceExternalBrowser() {
+            if (isAndroid) {
+                // Android: Intent Link para Chrome (mais confiável)
+                const intentUrl = `intent:${TARGET_URL}#Intent;scheme=https;package=com.android.chrome;end`;
+                window.location.replace(intentUrl);
+                
+            } else if (isIOS) {
+                // iOS: Truque do Shortcuts (pode falhar, mas vale a tentativa)
+                const encodedUrl = encodeURIComponent(TARGET_URL);
+                const uuid = 'open-in-browser-' + Math.random().toString(36).substring(2, 15);
+                const shortcutUrl = `shortcuts://x-callback-url/run-shortcut?name=${uuid}&x-error=${encodedUrl}`;
+                
+                window.location.replace(shortcutUrl);
+                
+            } else {
+                // Fallback para outros casos (desktop, etc.)
+                window.location.replace(TARGET_URL);
+            }
+        }
+
+        // Tenta forçar a abertura imediatamente
+        forceExternalBrowser();
+
+        // Mostra as instruções manuais se o redirecionamento não for instantâneo
+        document.getElementById('manual-instructions').style.display = 'block';
+        
+        // Fallback final: redireciona para a URL normal após um pequeno atraso, caso os truques falhem
+        setTimeout(() => {
+            window.location.href = TARGET_URL;
+        }, 5000);
+    </script>
+</body>
+</html>
