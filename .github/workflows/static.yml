@@ -1,74 +1,625 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecionamento Forçado - Abrindo no Navegador...</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 400px; margin: 50px auto; padding: 30px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; font-size: 1.5em; }
-        p { color: #666; line-height: 1.6; }
-        .manual-step { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
-        .manual-step strong { color: #007bff; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Redirecionando...</h1>
-        <p id="message">Estamos tentando abrir sua página de vendas no navegador padrão (Safari ou Chrome) para uma melhor experiência.</p>
-        
-        <div id="manual-instructions" style="display:none;">
-            <div class="manual-step">
-                <p><strong>Se não abrir:</strong></p>
-                <p>1. Toque no ícone de <strong>três pontos (...)</strong> no canto superior.</p>
-                <p>2. Selecione <strong>"Abrir no Navegador"</strong>.</p>
-            </div>
-        </div>
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Vendas</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #000000 0%, #065f46 50%, #000000 100%);
+    }
+    
+    .card-glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .pulse-animation {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scale(1.05);
+      }
+    }
+    
+    .button-glow {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+      transition: all 0.3s ease;
+    }
+    
+    .button-glow::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
+    }
+    
+    .button-glow:hover {
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
+      transform: translateY(-5px) scale(1.05);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.8s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .carousel-container {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .carousel-track {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+      gap: 1.5rem;
+    }
+
+    .carousel-slide {
+      min-width: 90%;
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 640px) {
+      .carousel-slide {
+        min-width: 70%;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .carousel-slide {
+        min-width: calc(45% - 0.75rem);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .carousel-slide {
+        min-width: calc(30% - 1rem);
+      }
+    }
+    
+    .carousel-slide img {
+      max-height: 500px;
+      object-fit: contain;
+    }
+
+    .carousel-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(16, 185, 129, 0.9);
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      .carousel-button {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+      }
+    }
+
+    .carousel-button:hover {
+      background: rgba(16, 185, 129, 1);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .carousel-button.prev {
+      left: 5px;
+    }
+
+    .carousel-button.next {
+      right: 5px;
+    }
+
+    @media (min-width: 768px) {
+      .carousel-button.prev {
+        left: 10px;
+      }
+
+      .carousel-button.next {
+        right: 10px;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <main class="h-full w-full overflow-auto"><!-- Hero Section -->
+   <section class="gradient-bg text-white py-8 sm:py-12 md:py-20 px-4 sm:px-6 text-center">
+    <div class="mb-6 fade-in"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/09/spb_2.0.svg" alt="Logo SPB 2.0" class="mx-auto mb-4 w-40 sm:w-48 md:w-72 h-auto" onerror="this.style.display='none'; this.alt='Logo não disponível';">
+     <h1 id="mainTitle" class="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-green-400 px-4 mb-6 md:mb-10 leading-tight">FAÇA SUA PRIMEIRA VENDA EM 7 DIAS SENDO MEU SÓCIO, OU EU DEVOLVO 100% DO SEU DINHEIRO E AINDA TE DOU 100 REAIS NO PIX</h1>
     </div>
+    <p id="subtitle" class="text-base sm:text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto text-red-500 font-bold fade-in px-4 mb-8 md:mb-10 leading-snug">COMECE DO ZERO, SEM APARECER, E COM UM ROBÔ VENDENDO POR VOCÊ TODOS OS DIAS</p><!-- Video Player -->
+    <div class="w-full mb-8 md:mb-12 px-4">
+     <div style="width:100%;max-width:900px;margin:0 auto;">
+      <div style="position:relative;width:100%;height:0;padding-bottom:56.25%;background:#000;border-radius:12px;overflow:hidden;"><iframe src="https://player.vimeo.com/video/1151724939?title=0&amp;byline=0&amp;portrait=0" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" loading="lazy" allowfullscreen allow="fullscreen; picture-in-picture" referrerpolicy="no-referrer"> </iframe>
+      </div>
+     </div>
+    </div>
+    <div class="mt-6 md:mt-8 px-4"><button id="ctaButton" class="button-glow bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 md:px-12 rounded-full text-base sm:text-lg md:text-xl transition-all pulse-animation w-full md:w-auto relative z-10 max-w-md mx-auto block" onclick="document.getElementById('offerSection').scrollIntoView({behavior: 'smooth'})">Comece Agora</button>
+    </div>
+   </section><!-- Testimonials Carousel Section -->
+   <section class="bg-black py-12 md:py-20 px-4 md:px-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-green-400 mb-4">DEPOIMENTOS</h2>
+      <p class="text-xl text-white">Se eles conseguiram, você também consegue</p>
+     </div>
+     <div class="carousel-container"><button class="carousel-button prev" onclick="moveCarousel(-1)">‹</button> <button class="carousel-button next" onclick="moveCarousel(1)">›</button>
+      <div class="carousel-track" id="carouselTrack">
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/d5-1.webp" alt="Depoimento 1" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/d3-1.webp" alt="Depoimento 2" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/D8-1.webp" alt="Depoimento 3" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/D9-1.webp" alt="Depoimento 4" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/d10-1.webp" alt="Depoimento 5" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/d7-1.webp" alt="Depoimento 6" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+       <div class="carousel-slide"><img src="https://heyinvestidor.com.br/wp-content/uploads/2025/10/d6-1.webp" alt="Depoimento 7" class="w-full h-auto rounded-2xl shadow-2xl" onerror="this.style.display='none';">
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Social Proof Section -->
+   <section class="bg-gradient-to-b from-black to-gray-900 py-12 md:py-20 px-4 md:px-6">
+    <div class="max-w-6xl mx-auto text-center mb-12">
+     <h2 class="text-3xl md:text-4xl font-bold text-green-400 mb-4">+5.000 Pessoas Já Estão Faturando</h2>
+     <p class="text-gray-300 text-lg">Veja o que nossos alunos estão dizendo:</p>
+    </div>
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+     <div class="card-glass p-6 rounded-2xl text-white">
+      <div class="flex items-center gap-3 mb-4">
+       <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl">
+        👤
+       </div>
+       <div>
+        <p class="font-bold">Maria Silva</p>
+        <p class="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</p>
+       </div>
+      </div>
+      <p class="text-gray-300">"Fiz minha primeira venda em 3 dias! Incrível como o sistema funciona no automático. Já recuperei o investimento."</p>
+     </div>
+     <div class="card-glass p-6 rounded-2xl text-white">
+      <div class="flex items-center gap-3 mb-4">
+       <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl">
+        👤
+       </div>
+       <div>
+        <p class="font-bold">João Santos</p>
+        <p class="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</p>
+       </div>
+      </div>
+      <p class="text-gray-300">"Comecei do zero absoluto. Hoje faço vendas todos os dias sem precisar aparecer. Melhor decisão que tomei!"</p>
+     </div>
+     <div class="card-glass p-6 rounded-2xl text-white">
+      <div class="flex items-center gap-3 mb-4">
+       <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-2xl">
+        👤
+       </div>
+       <div>
+        <p class="font-bold">Ana Costa</p>
+        <p class="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</p>
+       </div>
+      </div>
+      <p class="text-gray-300">"O suporte é sensacional! Qualquer dúvida é respondida na hora. Sistema realmente funciona como prometido."</p>
+     </div>
+    </div>
+   </section><!-- About Section -->
+   <section class="bg-gradient-to-b from-gray-900 to-black py-12 md:py-20 px-4 md:px-6">
+    <div class="max-w-6xl mx-auto">
+     <div class="card-glass rounded-3xl p-8 md:p-12">
+      <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+       <div class="flex justify-center"><img src="https://heyinvestidor.com.br/wp-content/uploads/2024/08/f1-2.webp" alt="Yan Pedro" class="rounded-2xl w-full max-w-md shadow-2xl" onerror="this.style.display='none'; this.alt='Imagem não disponível';">
+       </div>
+       <div class="text-white">
+        <h2 class="text-3xl md:text-4xl font-bold text-green-400 mb-6">EU SOU YAN PEDRO</h2>
+        <div class="space-y-4 text-gray-300 text-base md:text-lg leading-relaxed">
+         <p>Meu nome é Yan Pedro e sou fundador do <strong class="text-white">Hey Investidor</strong>, uma empresa de educaç��o com <strong class="text-green-400">+50.000 alunos</strong> espalhados pelo Brasil e pelo mundo e <strong class="text-green-400">+5 milhões de seguidores</strong> nas redes sociais.</p>
+         <p>Estou vivendo do mundo digital há quase 5 anos, e faturei o meu primeiro milh��o com apenas 20 anos.</p>
+         <p>Claro que nem sempre foi assim… durante muito tempo eu fiquei quebrando a cabeça e tentar achar várias maneiras de ganhar dinheiro na internet e mudar a minha vida.</p>
+         <p>Depois de bater muito a cara, eu finalmente descobri um método que permite que você crie uma nova fonte de renda extra e ganhe dinheiro todos os dias sem aparecer.</p>
+         <p class="text-green-400 font-bold text-xl">E agora que eu finalmente conquistei minha liberdade financeira através da internet, eu vou compartilhar com você o SPB pra te ajudar a mudar de vida</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Benefits Section -->
+   <section class="bg-black py-12 md:py-20 px-4 md:px-6">
+    <h2 class="text-3xl md:text-4xl font-bold text-green-400 text-center mb-12">Por Que Escolher o SPV 2.0?</h2>
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-6 md:gap-8">
+     <div class="card-glass p-6 md:p-8 rounded-2xl text-center text-white">
+      <div class="text-4xl md:text-5xl mb-4">
+       ⚡
+      </div>
+      <h3 id="benefit1" class="text-xl md:text-2xl font-bold text-green-400 mb-3">Resultados Rápidos</h3>
+      <p class="text-sm md:text-base text-gray-300">Implemente estratégias eficazes em poucos dias</p>
+     </div>
+     <div class="card-glass p-6 md:p-8 rounded-2xl text-center text-white">
+      <div class="text-4xl md:text-5xl mb-4">
+       🤖
+      </div>
+      <h3 id="benefit2" class="text-xl md:text-2xl font-bold text-green-400 mb-3">Automação Total</h3>
+      <p class="text-sm md:text-base text-gray-300">Sistema trabalhando 24 horas por dia para você</p>
+     </div>
+     <div class="card-glass p-6 md:p-8 rounded-2xl text-center text-white">
+      <div class="text-4xl md:text-5xl mb-4">
+       👥
+      </div>
+      <h3 id="benefit3" class="text-xl md:text-2xl font-bold text-green-400 mb-3">Suporte Exclusivo</h3>
+      <p class="text-sm md:text-base text-gray-300">Comunidade ativa e mentoria especializada</p>
+     </div>
+    </div>
+   </section><!-- What You Get Section -->
+   <section class="bg-gradient-to-b from-black to-gray-900 py-12 md:py-20 px-4 md:px-6">
+    <div class="max-w-4xl mx-auto">
+     <h2 class="text-3xl md:text-4xl font-bold text-green-400 text-center mb-12">O Que Você Vai Receber</h2>
+     <div class="space-y-4">
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4">
+       <div class="text-3xl flex-shrink-0">
+        📱
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-green-400 mb-2">Sistema Completo SPB 2.0</h3>
+        <p class="text-gray-300">Acesso vitalício à plataforma completa com todas as ferramentas e atualizações futuras incluídas</p>
+       </div>
+      </div>
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4">
+       <div class="text-3xl flex-shrink-0">
+        🤖
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-green-400 mb-2">Robô de Vendas Automatizado</h3>
+        <p class="text-gray-300">Configuração pronta para começar a vender em até 24h, sem necessidade de conhecimento técnico</p>
+       </div>
+      </div>
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4">
+       <div class="text-3xl flex-shrink-0">
+        🎓
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-green-400 mb-2">Treinamento Passo a Passo</h3>
+        <p class="text-gray-300">Vídeo aulas detalhadas mostrando exatamente o que fazer do início ao fim</p>
+       </div>
+      </div>
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4">
+       <div class="text-3xl flex-shrink-0">
+        💬
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-green-400 mb-2">Grupo VIP de Suporte</h3>
+        <p class="text-gray-300">Comunidade exclusiva com mentorias ao vivo e suporte direto da equipe</p>
+       </div>
+      </div>
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4 border-2 border-yellow-400">
+       <div class="text-3xl flex-shrink-0">
+        🎁
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-yellow-400 mb-2">BÔNUS: Templates Prontos</h3>
+        <p class="text-gray-300">Copys, scripts e materiais prontos para usar e começar a vender hoje mesmo</p>
+       </div>
+      </div>
+      <div class="card-glass p-6 rounded-xl text-white flex items-start gap-4 border-2 border-yellow-400">
+       <div class="text-3xl flex-shrink-0">
+        🎁
+       </div>
+       <div>
+        <h3 class="text-xl font-bold text-yellow-400 mb-2">BÔNUS: Estratégias Avançadas</h3>
+        <p class="text-gray-300">Métodos exclusivos para escalar suas vendas e multiplicar seus resultados</p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- FAQ Section -->
+   <section class="bg-black py-12 md:py-20 px-4 md:px-6">
+    <div class="max-w-4xl mx-auto">
+     <h2 class="text-3xl md:text-4xl font-bold text-green-400 text-center mb-12">Perguntas Frequentes</h2>
+     <div class="space-y-4">
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">Preciso de experiência prévia?</summary>
+       <p class="text-gray-300 mt-3">Não! O sistema foi criado para iniciantes. Você recebe tudo passo a passo, desde a configuração até a primeira venda.</p>
+      </details>
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">Preciso aparecer ou mostrar meu rosto?</summary>
+       <p class="text-gray-300 mt-3">Não! Todo o sistema funciona nos bastidores. Você não precisa aparecer, gravar vídeos ou expor sua identidade.</p>
+      </details>
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">Quanto tempo até a primeira venda?</summary>
+       <p class="text-gray-300 mt-3">Garantimos sua primeira venda em até 7 dias seguindo o método. Se não fizer, devolvemos 100% + R$100 de bônus.</p>
+      </details>
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">Preciso investir em anúncios?</summary>
+       <p class="text-gray-300 mt-3">Não obrigatoriamente! Ensinamos estratégias orgânicas para começar. Anúncios são opcionais para escalar mais rápido.</p>
+      </details>
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">Como funciona a garantia?</summary>
+       <p class="text-gray-300 mt-3">Você tem 7 dias para fazer sua primeira venda. Se não conseguir, devolvemos 100% do valor pago + R$100 extras no PIX.</p>
+      </details>
+      <details class="card-glass p-6 rounded-xl text-white group"><summary class="font-bold text-lg cursor-pointer text-green-400">O acesso é vitalício?</summary>
+       <p class="text-gray-300 mt-3">Sim! Pagamento único com acesso para sempre, incluindo todas as atualizações futuras da plataforma.</p>
+      </details>
+     </div>
+    </div>
+   </section><!-- Offer Section -->
+   <section id="offerSection" class="bg-gradient-to-b from-black to-green-950 py-12 md:py-20 px-4 md:px-6 text-center text-white">
+    <h2 id="offerTitle" class="text-3xl md:text-4xl lg:text-5xl font-bold text-green-400 mb-6 md:mb-8">Oferta Especial</h2>
+    <div class="card-glass max-w-3xl mx-auto p-6 md:p-10 rounded-3xl">
+     <div class="mb-6">
+      <p class="text-gray-400 line-through text-xl mb-2">De R$ 497,00</p>
+      <p id="priceText" class="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-green-400">11x de R$ 5,26 ou R$ 47,90 à vista</p>
+      <p class="text-yellow-400 font-bold text-lg">🔥 Desconto de 90% - Apenas Hoje!</p>
+     </div><!-- Benefits List -->
+     <div class="text-left mb-6 md:mb-8 space-y-3 md:space-y-4">
+      <div class="flex items-start gap-3"><span class="text-green-400 text-xl md:text-2xl flex-shrink-0 mt-1">✓</span>
+       <p class="text-base md:text-lg text-gray-200"><strong class="text-white">Robô de Vendas Automatizado:</strong> Sistema completo que vende 24/7 por você</p>
+      </div>
+      <div class="flex items-start gap-3"><span class="text-green-400 text-xl md:text-2xl flex-shrink-0 mt-1">✓</span>
+       <p class="text-base md:text-lg text-gray-200"><strong class="text-white">Sem Aparecer:</strong> Trabalhe nos bastidores, sem expor seu rosto</p>
+      </div>
+      <div class="flex items-start gap-3"><span class="text-green-400 text-xl md:text-2xl flex-shrink-0 mt-1">✓</span>
+       <p class="text-base md:text-lg text-gray-200"><strong class="text-white">Garantia de 7 Dias:</strong> Primeira venda garantida ou dinheiro de volta + R$100</p>
+      </div>
+      <div class="flex items-start gap-3"><span class="text-green-400 text-xl md:text-2xl flex-shrink-0 mt-1">✓</span>
+       <p class="text-base md:text-lg text-gray-200"><strong class="text-white">Suporte Exclusivo:</strong> Comunidade ativa e mentoria para seu sucesso</p>
+      </div>
+      <div class="flex items-start gap-3"><span class="text-green-400 text-xl md:text-2xl flex-shrink-0 mt-1">✓</span>
+       <p class="text-base md:text-lg text-gray-200"><strong class="text-white">Do Zero ao Lucro:</strong> Mesmo sem experiência, comece do absoluto zero</p>
+      </div>
+     </div>
+     <div class="bg-gradient-to-r from-green-900/30 to-green-800/30 rounded-xl p-4 mb-6 md:mb-8 border border-green-500/30">
+      <p class="text-yellow-400 font-bold text-base md:text-lg">🎁 Bônus Exclusivos por Tempo Limitado!</p>
+     </div><a href="https://pay.kirvano.com/48025df2-8c36-4f78-a97d-6e07db72ca40?aff=5cb3cd72-bcfc-4450-8a08-30c40d71c015" target="_blank" rel="noopener noreferrer" class="button-glow block bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-bold py-5 px-8 rounded-full text-xl transition-all text-center touch-manipulation relative z-10" style="min-height: 60px; display: flex; align-items: center; justify-content: center;">Garantir Minha Vaga Agora</a>
+     <p class="text-sm text-gray-400 mt-6">🔒 Pagamento 100% Seguro | ⚡ Acesso Imediato</p>
+    </div>
+   </section><!-- Footer -->
+   <footer class="bg-black text-gray-400 py-8 md:py-10 text-center px-4 md:px-6">
+    <p class="text-sm md:text-base mb-4">© 2024 Todos os direitos reservados</p>
+    <p class="text-xs text-gray-500">Este site não faz parte do Facebook ou Facebook Inc. Além disso, este site NÃO é endossado pelo Facebook de nenhuma maneira. Facebook é uma marca registrada da Facebook, Inc.</p>
+   </footer>
+  </main>
+  <script>
+    // Carousel functionality
+    let currentIndex = 0;
+    const track = document.getElementById('carouselTrack');
+    const slides = document.querySelectorAll('.carousel-slide');
+    const totalSlides = slides.length;
 
-    <script>
-        // ********************************************************************
-        // PASSO 1: SUBSTITUA ESTA URL PELA URL FINAL DO SEU GOOGLE SITES
-        // ********************************************************************
-        const TARGET_URL = "https://sites.google.com/view/kirvanovendas/kauan"; 
-        // ********************************************************************
+    function getVisibleSlides() {
+      if (window.innerWidth >= 1024) return 3;
+      if (window.innerWidth >= 768) return 2;
+      if (window.innerWidth >= 640) return 1.3;
+      return 1;
+    }
 
-        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-        const isAndroid = /android/i.test(userAgent);
+    function updateCarousel() {
+      const visibleSlides = getVisibleSlides();
+      const maxIndex = totalSlides - visibleSlides;
+      
+      if (currentIndex > maxIndex) {
+        currentIndex = maxIndex;
+      }
+      if (currentIndex < 0) {
+        currentIndex = 0;
+      }
 
-        // Função para forçar a abertura
-        function forceExternalBrowser() {
-            if (isAndroid) {
-                // Android: Intent Link para Chrome (mais confiável)
-                const intentUrl = `intent:${TARGET_URL}#Intent;scheme=https;package=com.android.chrome;end`;
-                window.location.replace(intentUrl);
-                
-            } else if (isIOS) {
-                // iOS: Truque do Shortcuts (pode falhar, mas vale a tentativa)
-                const encodedUrl = encodeURIComponent(TARGET_URL);
-                const uuid = 'open-in-browser-' + Math.random().toString(36).substring(2, 15);
-                const shortcutUrl = `shortcuts://x-callback-url/run-shortcut?name=${uuid}&x-error=${encodedUrl}`;
-                
-                window.location.replace(shortcutUrl);
-                
-            } else {
-                // Fallback para outros casos (desktop, etc.)
-                window.location.replace(TARGET_URL);
+      const slideWidth = slides[0].offsetWidth;
+      const gap = 24; // 1.5rem gap
+      const offset = -(currentIndex * (slideWidth + gap));
+      track.style.transform = `translateX(${offset}px)`;
+    }
+
+    function moveCarousel(direction) {
+      const visibleSlides = getVisibleSlides();
+      const maxIndex = totalSlides - visibleSlides;
+      
+      currentIndex += direction;
+      
+      if (currentIndex < 0) {
+        currentIndex = 0;
+      }
+      if (currentIndex > maxIndex) {
+        currentIndex = maxIndex;
+      }
+      
+      updateCarousel();
+    }
+
+    window.addEventListener('resize', updateCarousel);
+    updateCarousel();
+
+    const defaultConfig = {
+      main_title: "FAÇA SUA PRIMEIRA VENDA EM 7 DIAS SENDO MEU SÓCIO, OU EU DEVOLVO 100% DO SEU DINHEIRO E AINDA TE DOU 100 REAIS NO PIX",
+      subtitle: "COMECE DO ZERO, SEM APARECER, E COM UM ROBÔ VENDENDO POR VOCÊ TODOS OS DIAS",
+      cta_button: "Comece Agora",
+      benefit_1: "Resultados Rápidos",
+      benefit_2: "Automação Total",
+      benefit_3: "Suporte Exclusivo",
+      offer_title: "Oferta Especial",
+      price_text: "11x de R$ 5,26 ou R$ 47,90 à vista",
+      background_color: "#000000",
+      accent_color: "#10b981",
+      text_color: "#ffffff",
+      font_family: "Inter",
+      font_size: 16
+    };
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+
+      document.getElementById('mainTitle').textContent = config.main_title || defaultConfig.main_title;
+      document.getElementById('subtitle').textContent = config.subtitle || defaultConfig.subtitle;
+      document.getElementById('ctaButton').textContent = config.cta_button || defaultConfig.cta_button;
+      document.getElementById('benefit1').textContent = config.benefit_1 || defaultConfig.benefit_1;
+      document.getElementById('benefit2').textContent = config.benefit_2 || defaultConfig.benefit_2;
+      document.getElementById('benefit3').textContent = config.benefit_3 || defaultConfig.benefit_3;
+      document.getElementById('offerTitle').textContent = config.offer_title || defaultConfig.offer_title;
+      document.getElementById('priceText').textContent = config.price_text || defaultConfig.price_text;
+
+      document.body.style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.body.style.fontSize = `${baseSize}px`;
+      
+      const mainTitle = document.getElementById('mainTitle');
+      if (window.innerWidth < 640) {
+        mainTitle.style.fontSize = `${baseSize * 1.5}px`;
+      } else if (window.innerWidth < 768) {
+        mainTitle.style.fontSize = `${baseSize * 1.875}px`;
+      } else {
+        mainTitle.style.fontSize = `${baseSize * 3}px`;
+      }
+      
+      const subtitle = document.getElementById('subtitle');
+      if (window.innerWidth < 640) {
+        subtitle.style.fontSize = `${baseSize * 1}px`;
+      } else {
+        subtitle.style.fontSize = `${baseSize * 1.25}px`;
+      }
+
+      const backgroundColor = config.background_color || defaultConfig.background_color;
+      const accentColor = config.accent_color || defaultConfig.accent_color;
+      const textColor = config.text_color || defaultConfig.text_color;
+
+      document.body.style.backgroundColor = backgroundColor;
+      document.body.style.color = textColor;
+      
+      const buttons = document.querySelectorAll('button');
+      buttons.forEach(btn => {
+        btn.style.backgroundColor = accentColor;
+      });
+
+      const links = document.querySelectorAll('a[href*="kirvano"]');
+      links.forEach(link => {
+        link.style.backgroundColor = accentColor;
+      });
+
+      const accentTexts = document.querySelectorAll('.text-green-400');
+      accentTexts.forEach(el => {
+        el.style.color = accentColor;
+      });
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              config.background_color = value;
+              window.elementSdk.setConfig({ background_color: value });
             }
+          },
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            config.font_size = value;
+            window.elementSdk.setConfig({ font_size: value });
+          }
         }
+      };
+    }
 
-        // Tenta forçar a abertura imediatamente
-        forceExternalBrowser();
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["main_title", config.main_title || defaultConfig.main_title],
+        ["subtitle", config.subtitle || defaultConfig.subtitle],
+        ["cta_button", config.cta_button || defaultConfig.cta_button],
+        ["benefit_1", config.benefit_1 || defaultConfig.benefit_1],
+        ["benefit_2", config.benefit_2 || defaultConfig.benefit_2],
+        ["benefit_3", config.benefit_3 || defaultConfig.benefit_3],
+        ["offer_title", config.offer_title || defaultConfig.offer_title],
+        ["price_text", config.price_text || defaultConfig.price_text]
+      ]);
+    }
 
-        // Mostra as instruções manuais se o redirecionamento não for instantâneo
-        document.getElementById('manual-instructions').style.display = 'block';
-        
-        // Fallback final: redireciona para a URL normal após um pequeno atraso, caso os truques falhem
-        setTimeout(() => {
-            window.location.href = TARGET_URL;
-        }, 5000);
-    </script>
-</body>
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b9eabdf35cca5e7',t:'MTc2NzczODc0Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
